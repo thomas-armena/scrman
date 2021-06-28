@@ -5,6 +5,7 @@ import (
 	"os"
 	"scr/create"
 	"scr/dir"
+	"scr/install"
 	"scr/run"
 )
 
@@ -34,6 +35,13 @@ func main() {
 
 	if cmd == "run" {
 		err = run.Run(cmdArgs)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if cmd == "install" {
+		err = install.Install(cmdArgs)
 		if err != nil {
 			log.Fatal(err)
 		}

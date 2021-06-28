@@ -1,6 +1,7 @@
 package dir
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gobuffalo/packr"
@@ -65,25 +66,25 @@ func InitProject(projectName string) error {
 
 	os.Chdir(projectDir)
 
-	box := packr.NewBox("../templates")
+	box := packr.NewBox("../templates/helloworld")
 	index, err := box.Find("index.sh")
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to get index.sh: %v", err)
 	}
 
 	config, err := box.Find("config.json")
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to get config.json: %v", err)
 	}
 
 	err = os.WriteFile("index.sh", index, 0777)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to write index.sh: %v", err)
 	}
 
 	err = os.WriteFile("config.json", config, 0777)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to write config.json: %v", err)
 	}
 
 	return nil
