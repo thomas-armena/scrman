@@ -104,16 +104,17 @@ In each script project, configurations are stored in a `config.json` file.
 Here is an example of a config file:
 
 ```json
+// config.json
 {
-    location: "./",
-    arguments: [
+    "location": "./",
+    "arguments": [
         {
-            name: "Example Argument 1",
-            default: "Example Default Value",
+            "name": "Example Argument 1",
+            "default": "Example Default Value",
         },
         {
-            name: "Example Argument 2",
-            default: 1,
+            "name": "Example Argument 2",
+            "default": 1,
         },
     ]
 }
