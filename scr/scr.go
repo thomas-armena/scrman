@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -8,6 +9,11 @@ import (
 )
 
 func main() {
+
+	args := os.Args[1:]
+
+	fmt.Println(args)
+
 	err := initDirectories()
 	if err != nil {
 		log.Fatal(err)
