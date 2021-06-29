@@ -53,13 +53,11 @@ func InstallByScriptName(scriptName string) error {
 		return err
 	}
 
-	binDirectory, err := dir.GetBinDir()
-	if err != nil {
-		return err
-	}
 
+	binDirectory := dir.GetBinDir()
 	binaryName := getLeafOfPath(scriptName)
 	file, err := os.Create(binDirectory + "/" + binaryName)
+
 	if err != nil {
 		return err
 	}

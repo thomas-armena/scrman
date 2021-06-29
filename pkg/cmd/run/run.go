@@ -32,10 +32,7 @@ func run(args []string) error {
 }
 
 func runScript(scriptName string) error {
-	scriptDir, err := dir.GetScriptDir(scriptName)
-	if err != nil {
-		return err
-	}
+	scriptDir := dir.GetScriptDir(scriptName)
 
 	scriptArgs := make([]string, 0)
 	scriptArgs = append(scriptArgs, "")

@@ -7,158 +7,86 @@ import (
 	"github.com/gobuffalo/packr"
 )
 
-func GetScriptDir(scriptName string) (string, error) {
-	scrmanDir, err := GetScrmanDir()
-	if err != nil {
-		return "", err
-	}
-	return scrmanDir + "/scripts/" + scriptName, nil
-}
+var scrmanRoot = ""
 
-func GetBinDir() (string, error) {
-	scrmanDir, err := GetScrmanDir()
-	if err != nil {
-		return "", err
-	}
-	return scrmanDir + "/bin/", nil
-}
-
-func GetScrmanDir() (string, error) {
+func DefaultRoot() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("unable to get home dir: %v", err)
 	}
-	return homeDir + "/.scrman", nil
+
+	root := homeDir + "/.scrman"
+
+	return root, nil
 }
 
-func InitDirectories() error {
+func GetRootDir() string {
+	return scrmanRoot
+}
 
-	currDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	defer os.Chdir(currDir)
+func GetScriptDir(scriptName string) string {
+	return scrmanRoot + "/scripts/" + scriptName
+}
 
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
+func GetBinDir() string {
+	return scrmanRoot + "/bin/"
+}
 
-	os.Chdir(homeDir)
-
-	err = os.MkdirAll(".scrman", 0777)
-	if err != nil {
-		return err
-	}
-
-	os.Chdir(".scrman")
-
-	err = os.MkdirAll("bin", 0777)
+func InitDefault() error {
+	root, err := DefaultRoot()
 	if err != nil {
 		return err
 	}
 
-	err = os.MkdirAll("scripts", 0777)
-	if err != nil {
-		return err
+	return Init(root)
+}
+
+func Init(appRoot string) error {
+	scrmanRoot = appRoot
+
+	if err := os.MkdirAll(GetRootDir(), 0777); err != nil {
+		return fmt.Errorf("unable to make scrman root directory: %v", err)
 	}
 
-	// TODO: Remove this
-	err = initHelloWorld()
-	if err != nil {
-		return err
+	if err := os.MkdirAll(GetScriptDir(""), 0777); err != nil {
+		return fmt.Errorf("unable to make scrman scripts directory: %v", err)
 	}
+
+	if err := os.MkdirAll(GetBinDir(), 0777); err != nil {
+		return fmt.Errorf("unable to make scrman bin directory: %v", err)
+	}
+
 	return nil
 }
 
-func InitProject(projectName string) error {
-
-	// TODO: validate project name
-
-	currDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	defer os.Chdir(currDir)
-
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
+func CreateScriptDir(scriptName string) error {
+	if scriptName == "" {
+		return fmt.Errorf("script name cannot be empty")
 	}
 
-	projectDir := homeDir + "/.scrman/scripts/" + projectName
-
-	err = os.MkdirAll(projectDir, 0777)
-	if err != nil {
-		return err
+	scriptDir := GetScriptDir(scriptName)
+	if err := os.MkdirAll(scriptDir, 0777); err != nil {
+		return fmt.Errorf("unable to create new script directory: %v", err)
 	}
-
-	os.Chdir(projectDir)
 
 	box := packr.NewBox("../../templates/script")
 	index, err := box.Find("index.sh")
 	if err != nil {
-		return fmt.Errorf("unable to get index.sh: %v", err)
+		return fmt.Errorf("unable to find index.sh template: %v", err)
 	}
 
 	config, err := box.Find("config.json")
 	if err != nil {
-		return fmt.Errorf("unable to get config.json: %v", err)
+		return fmt.Errorf("unable to find config.json template: %v", err)
 	}
 
-	err = os.WriteFile("index.sh", index, 0777)
-	if err != nil {
+	scriptPath := scriptDir + "/index.sh"
+	if err := os.WriteFile(scriptPath, index, 0777); err != nil {
 		return fmt.Errorf("unable to write index.sh: %v", err)
 	}
 
-	err = os.WriteFile("config.json", config, 0777)
-	if err != nil {
-		return fmt.Errorf("unable to write config.json: %v", err)
-	}
-
-	return nil
-}
-
-// TODO: Remove this
-func initHelloWorld() error {
-	currDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	defer os.Chdir(currDir)
-
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-
-	projectDir := homeDir + "/.scrman/scripts/helloworld"
-
-	err = os.MkdirAll(projectDir, 0777)
-	if err != nil {
-		return err
-	}
-
-	os.Chdir(projectDir)
-
-	box := packr.NewBox("../../templates/helloworld")
-	index, err := box.Find("index.sh")
-	if err != nil {
-		return fmt.Errorf("unable to get index.sh: %v", err)
-	}
-
-	config, err := box.Find("config.json")
-	if err != nil {
-		return fmt.Errorf("unable to get config.json: %v", err)
-	}
-
-	err = os.WriteFile("index.sh", index, 0777)
-	if err != nil {
-		return fmt.Errorf("unable to write index.sh: %v", err)
-	}
-
-	err = os.WriteFile("config.json", config, 0777)
-	if err != nil {
+	configPath := scriptDir + "/config.json"
+	if err := os.WriteFile(configPath, config, 0777); err != nil {
 		return fmt.Errorf("unable to write config.json: %v", err)
 	}
 

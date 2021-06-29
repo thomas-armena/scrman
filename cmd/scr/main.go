@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	if err := dir.InitDirectories(); err != nil {
+	if err := dir.InitDefault(); err != nil {
 		log.Fatalf("Unable to initalize scr directories: %v", err)
 	}
 

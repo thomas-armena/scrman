@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/thomas-armena/scrman/pkg/cmd/install"
+
 	"github.com/thomas-armena/scrman/pkg/dir"
 )
 
@@ -44,15 +44,11 @@ func create(args []string) error {
 	scriptText := strings.Join(recentHistory[startingIndex-1:], "")
 	fmt.Println(scriptText)
 
-	err = dir.InitProject(scriptName)
-	if err != nil {
-		return fmt.Errorf("create: init project: %v", err)
+	if err := dir.CreateScriptDir(scriptName); err != nil {
+		return fmt.Errorf("unable to create script dir: %v", err)
 	}
 
-	scriptDir, err := dir.GetScriptDir(scriptName)
-	if err != nil {
-		return fmt.Errorf("create: %v", err)
-	}
+	scriptDir := dir.GetScriptDir(scriptName)
 	indexFile, err := os.OpenFile(scriptDir+"/index.sh", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		return fmt.Errorf("create: %v", err)
@@ -60,11 +56,6 @@ func create(args []string) error {
 	defer indexFile.Close()
 	if _, err = indexFile.WriteString(scriptText); err != nil {
 		return err
-	}
-
-	err = install.InstallByScriptName(scriptName)
-	if err != nil {
-		return fmt.Errorf("create: %v", err)
 	}
 
 	return nil
