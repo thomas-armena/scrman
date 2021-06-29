@@ -17,18 +17,14 @@ type Repository struct {
 
 func FetchRepo(repo Repository) error {
 
-	scrmanDir, err := dir.GetScrmanDir()
-	if err != nil {
-		return fmt.Errorf("unable to fetch repo %v: %v", repo.Name, err)
-	}
+	scrmanDir := dir.GetRootDir()
 	scriptDir := fmt.Sprintf("%v/scripts/%v/%v", scrmanDir, repo.Author, repo.Name)
-	err = os.MkdirAll(scriptDir, 0777)
-	if err != nil {
+	if err := os.MkdirAll(scriptDir, 0777); err != nil {
 		return fmt.Errorf("unable to fetch repo %v: %v", repo.Name, err)
 	}
 	url := fmt.Sprintf("https://github.com/%v/%v", repo.Author, repo.Name)
 
-	_, err = git.PlainClone(scriptDir, false, &git.CloneOptions{
+	_, err := git.PlainClone(scriptDir, false, &git.CloneOptions{
 		URL:      url,
 		Progress: os.Stdout,
 	})
