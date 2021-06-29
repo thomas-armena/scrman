@@ -1,6 +1,7 @@
 package install
 
 import (
+	"fmt"
 	"html/template"
 	"os"
 	"scr/dir"
@@ -14,8 +15,15 @@ type InstallScript struct {
 
 func Install(args []string) error {
 	scriptName := args[0]
+	err := InstallByScriptName(scriptName)
+	if err != nil {
+		return fmt.Errorf("unable to install script: %v", err)
+	}
 	// TODO: Validate scriptName exists
+	return nil
+}
 
+func InstallByScriptName(scriptName string) error {
 	box := packr.NewBox("../templates/")
 	scriptTemplateText, err := box.FindString("install.sh")
 	if err != nil {

@@ -66,7 +66,7 @@ func InitProject(projectName string) error {
 
 	os.Chdir(projectDir)
 
-	box := packr.NewBox("../templates/helloworld")
+	box := packr.NewBox("../templates/script")
 	index, err := box.Find("index.sh")
 	if err != nil {
 		return fmt.Errorf("unable to get index.sh: %v", err)
