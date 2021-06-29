@@ -22,9 +22,13 @@ TODO
 
 TODO
 
-### Add bin to path
+### Add bin to PATH
 
-TODO
+Add the following to your `.zshrc` or `.bashrc`:
+
+```sh
+PATH=$PATH:~/.scrman/bin
+```
 
 --------------------------------------------------------------------------------------
 
