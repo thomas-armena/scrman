@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gobuffalo/packr"
+	"github.com/thomas-armena/scrman/pkg/templates"
 )
 
 var scrmanRoot = ""
@@ -69,13 +69,12 @@ func CreateScriptDir(scriptName string) error {
 		return fmt.Errorf("unable to create new script directory: %v", err)
 	}
 
-	box := packr.NewBox("../../templates/script")
-	index, err := box.Find("index.sh")
+	index, err := templates.Find("script/index.sh")
 	if err != nil {
 		return fmt.Errorf("unable to find index.sh template: %v", err)
 	}
 
-	config, err := box.Find("config.json")
+	config, err := templates.Find("script/config.json")
 	if err != nil {
 		return fmt.Errorf("unable to find config.json template: %v", err)
 	}
