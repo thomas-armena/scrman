@@ -4,16 +4,29 @@ import (
 	"fmt"
 	"html/template"
 	"os"
-	"scr/dir"
 
 	"github.com/gobuffalo/packr"
+	"github.com/spf13/cobra"
+	"github.com/thomas-armena/scrman/pkg/dir"
 )
 
 type InstallScript struct {
 	ScriptName string
 }
 
-func Install(args []string) error {
+func NewCmdInstall() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "install",
+		Short: "Install an existing bash script",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return install(args)
+		},
+	}
+
+	return cmd
+}
+
+func install(args []string) error {
 	scriptName := args[0]
 	err := InstallByScriptName(scriptName)
 	if err != nil {
@@ -23,8 +36,9 @@ func Install(args []string) error {
 	return nil
 }
 
+// TODO: Move this function to another package. It is also used by create cmd.
 func InstallByScriptName(scriptName string) error {
-	box := packr.NewBox("../templates/")
+	box := packr.NewBox("../../../templates/")
 	scriptTemplateText, err := box.FindString("install.sh")
 	if err != nil {
 		return err
