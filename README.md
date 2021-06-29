@@ -33,7 +33,7 @@ TODO
 ### Creating Scripts
 
 ```sh
-scr init
+scr create
 ```
 
 This command will start a dialogue to save commands you just ran in the terminal and
@@ -56,6 +56,8 @@ scr run <author-username>/<repository>
 ```sh
 scr run <script-name>
 ```
+
+This command will run scripts located in `~/.scrman/scripts/`
 
 #### Installing a script
 
