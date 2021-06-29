@@ -85,6 +85,30 @@ helloworld
 > "Hello World!"
 ```
 
+#### Fetching a script repository
+
+Script repositories are git repositories containing a group of scripts. You can get them 
+using the fetch command:
+
+```sh
+scr fetch thomas-armena/scripts
+```
+
+Now you can treat them as any other local scripts
+
+- Run:
+
+```sh
+scr run thomas-armena/scripts/testgit
+```
+
+- Install:
+
+```sh
+scr install thomas-armena/scripts/testgit
+testgit
+```
+
 --------------------------------------------------------------------------------------
 
 ## Configuration
