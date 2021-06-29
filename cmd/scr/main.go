@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/thomas-armena/scrman/pkg/cmd/create"
+	"github.com/thomas-armena/scrman/pkg/cmd/fetch"
 	"github.com/thomas-armena/scrman/pkg/cmd/install"
 	"github.com/thomas-armena/scrman/pkg/cmd/run"
 	"github.com/thomas-armena/scrman/pkg/dir"
@@ -23,11 +24,13 @@ func main() {
 	createCmd := create.NewCmdCreate()
 	runCmd := run.NewCmdRun()
 	installCmd := install.NewCmdInstall()
+	fetchCmd := fetch.NewCmdFetch()
 
 	rootCmd.AddCommand(
 		createCmd,
 		runCmd,
 		installCmd,
+		fetchCmd,
 	)
 
 	if err := rootCmd.Execute(); err != nil {

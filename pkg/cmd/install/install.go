@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"strings"
 
 	"github.com/gobuffalo/packr"
 	"github.com/spf13/cobra"
@@ -38,6 +39,7 @@ func install(args []string) error {
 
 // TODO: Move this function to another package. It is also used by create cmd.
 func InstallByScriptName(scriptName string) error {
+
 	box := packr.NewBox("../../../templates/")
 	scriptTemplateText, err := box.FindString("install.sh")
 	if err != nil {
@@ -55,7 +57,9 @@ func InstallByScriptName(scriptName string) error {
 	if err != nil {
 		return err
 	}
-	file, err := os.Create(binDirectory + "/" + scriptName)
+
+	binaryName := getLeafOfPath(scriptName)
+	file, err := os.Create(binDirectory + "/" + binaryName)
 	if err != nil {
 		return err
 	}
@@ -66,4 +70,9 @@ func InstallByScriptName(scriptName string) error {
 	scriptTemplate.Execute(file, script)
 
 	return nil
+}
+
+func getLeafOfPath(path string) string {
+	separated := strings.Split(path, "/")
+	return separated[len(separated)-1]
 }

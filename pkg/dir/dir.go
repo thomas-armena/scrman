@@ -8,7 +8,7 @@ import (
 )
 
 func GetScriptDir(scriptName string) (string, error) {
-	scrmanDir, err := getScrmanDir()
+	scrmanDir, err := GetScrmanDir()
 	if err != nil {
 		return "", err
 	}
@@ -16,14 +16,14 @@ func GetScriptDir(scriptName string) (string, error) {
 }
 
 func GetBinDir() (string, error) {
-	scrmanDir, err := getScrmanDir()
+	scrmanDir, err := GetScrmanDir()
 	if err != nil {
 		return "", err
 	}
 	return scrmanDir + "/bin/", nil
 }
 
-func getScrmanDir() (string, error) {
+func GetScrmanDir() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("unable to get home dir: %v", err)
