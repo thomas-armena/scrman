@@ -19,10 +19,8 @@ type Argument struct {
 }
 
 func GetConfig(scriptName string) (*Config, error) {
-	scriptDir, err := dir.GetScriptDir(scriptName)
-	if err != nil {
-		return nil, fmt.Errorf("unable to parse config file: %v", err)
-	}
+	scriptDir := dir.GetScriptDir(scriptName)
+
 	configFile, err := os.ReadFile(scriptDir + "/config.json")
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse config file: %v", err)
