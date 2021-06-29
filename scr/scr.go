@@ -16,11 +16,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = dir.InitProject("helloworld")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	args := os.Args[1:]
 
 	cmd := args[0]
