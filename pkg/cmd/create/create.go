@@ -44,7 +44,11 @@ func create(args []string) error {
 	scriptText := strings.Join(recentHistory[startingIndex-1:], "")
 	fmt.Println(scriptText)
 
-	dir.InitProject(scriptName)
+	err = dir.InitProject(scriptName)
+	if err != nil {
+		return fmt.Errorf("create: init project: %v", err)
+	}
+
 	scriptDir, err := dir.GetScriptDir(scriptName)
 	if err != nil {
 		return fmt.Errorf("create: %v", err)
