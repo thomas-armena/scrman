@@ -27,6 +27,7 @@ func TestInit(t *testing.T) {
 		{name: "scripts/hello", expected: dir + "/scripts/hello", got: GetScriptDir("hello")},
 		{name: "bin", expected: dir + "/bin/", got: GetBinDir()},
 	}
+
 	for _, tc := range testCases {
 		if tc.expected != tc.got {
 			t.Fatalf("%v = %q; want %q", tc.name, tc.got, tc.expected)
@@ -44,4 +45,33 @@ func TestInit(t *testing.T) {
 	if _, err := os.Stat(GetBinDir()); os.IsNotExist(err) {
 		t.Fatalf("failed to find bin dir: %v", err)
 	}
+}
+
+func TestCreateScriptDir(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	if err != nil {
+		t.Fatalf("Unable to generate a temp dir: %v", err)
+	}
+	defer os.RemoveAll(dir)
+
+	if err := Init(dir); err != nil {
+		t.Fatalf("failed to initalize dir: %v", err)
+	}
+
+	if err := CreateScriptDir("hellotest"); err != nil {
+		t.Fatalf("unable to create script dir: %v", err)
+	}
+
+	if _, err := os.Stat(GetScriptDir("hellotest")); os.IsNotExist(err) {
+		t.Fatalf("failed to find scripts dir: %v", err)
+	}
+
+	if _, err := os.Stat(GetScriptDir("hellotest/index.sh")); os.IsNotExist(err) {
+		t.Fatalf("failed to find scripts dir: %v", err)
+	}
+
+	if _, err := os.Stat(GetScriptDir("hellotest/config.json")); os.IsNotExist(err) {
+		t.Fatalf("failed to find scripts dir: %v", err)
+	}
+
 }
