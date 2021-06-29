@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 
 	"github.com/thomas-armena/scrman/pkg/dir"
@@ -23,26 +24,17 @@ func NewCmdCreate() *cobra.Command {
 }
 
 func create(args []string) error {
-
-	history, err := getZshHistory()
+	scriptText, err := getScriptInput()
 	if err != nil {
-		return fmt.Errorf("create: %v", err)
+		return fmt.Errorf("unable to create script dir: %v", err)
 	}
-	recentHistory := history[len(history)-11 : len(history)-1]
-	for i, cmd := range recentHistory {
-		fmt.Printf("%v: %v", i+1, cmd)
-	}
-
-	fmt.Printf("Enter number of command to start at: ")
-	var startingIndex int
-	fmt.Scan(&startingIndex)
+	fmt.Println("------------------")
+	fmt.Println(scriptText)
+	fmt.Println("------------------")
 
 	fmt.Printf("Enter name of script: ")
 	var scriptName string
 	fmt.Scanln(&scriptName)
-
-	scriptText := strings.Join(recentHistory[startingIndex-1:], "")
-	fmt.Println(scriptText)
 
 	if err := dir.CreateScriptDir(scriptName); err != nil {
 		return fmt.Errorf("unable to create script dir: %v", err)
@@ -57,8 +49,62 @@ func create(args []string) error {
 	if _, err = indexFile.WriteString(scriptText); err != nil {
 		return err
 	}
+	fmt.Println("Script created in: " + scriptDir)
 
 	return nil
+}
+
+func getScriptInput() (string, error) {
+	history, err := getZshHistory()
+	if err != nil {
+		return "", fmt.Errorf("create: %v", err)
+	}
+
+	numCommandsToShow := min(25, len(history))
+	pageLength := min(10, numCommandsToShow)
+	lastIndex := len(history) - 1
+
+	commands := history[lastIndex-numCommandsToShow : lastIndex]
+
+	startSelectTemplates := &promptui.SelectTemplates{
+		Label:    "Select starting command",
+		Selected: " ",
+	}
+	startPrompt := promptui.Select{
+		Label:     "Select starting command",
+		Items:     commands,
+		Size:      pageLength,
+		Templates: startSelectTemplates,
+	}
+
+	startingIndex, _, err := startPrompt.RunCursorAt(len(commands)-1, len(commands)-pageLength)
+
+	if err != nil {
+		return "", fmt.Errorf("unable to create script dir: %v", err)
+	}
+
+	commands = commands[startingIndex:]
+
+	endSelectTemplates := &promptui.SelectTemplates{
+		Label:    "Select ending command",
+		Selected: "Script:",
+	}
+	endPrompt := promptui.Select{
+		Label:     "Select ending command",
+		Items:     commands,
+		Size:      pageLength,
+		Templates: endSelectTemplates,
+	}
+
+	endingIndex, _, err := endPrompt.RunCursorAt(len(commands)-1, len(commands)-1-pageLength)
+
+	commands = commands[:endingIndex+1]
+
+	if err != nil {
+		return "", fmt.Errorf("unable to create script dir: %v", err)
+	}
+
+	return strings.Join(commands, "\n"), nil
 }
 
 // Assumes history is stored in ~/.zsh_history
@@ -79,7 +125,14 @@ func getZshHistory() ([]string, error) {
 		if len(x) < 2 {
 			continue
 		}
-		history = append(history, x[1])
+		history = append(history, strings.Trim(x[1], "\n "))
 	}
 	return history, nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
