@@ -3,6 +3,7 @@ module github.com/thomas-armena/scrman
 go 1.16
 
 require (
+	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gobuffalo/packd v1.0.0 // indirect
 	github.com/gobuffalo/packr v1.30.1
