@@ -3,12 +3,26 @@ package create
 import (
 	"fmt"
 	"os"
-	"scr/dir"
-	"scr/install"
 	"strings"
+
+	"github.com/spf13/cobra"
+	"github.com/thomas-armena/scrman/pkg/cmd/install"
+	"github.com/thomas-armena/scrman/pkg/dir"
 )
 
-func Create(args []string) error {
+func NewCmdCreate() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create a new bash script from bash history",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return create(args)
+		},
+	}
+
+	return cmd
+}
+
+func create(args []string) error {
 
 	history, err := getZshHistory()
 	if err != nil {

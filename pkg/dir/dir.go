@@ -7,6 +7,30 @@ import (
 	"github.com/gobuffalo/packr"
 )
 
+func GetScriptDir(scriptName string) (string, error) {
+	scrmanDir, err := getScrmanDir()
+	if err != nil {
+		return "", err
+	}
+	return scrmanDir + "/scripts/" + scriptName, nil
+}
+
+func GetBinDir() (string, error) {
+	scrmanDir, err := getScrmanDir()
+	if err != nil {
+		return "", err
+	}
+	return scrmanDir + "/bin/", nil
+}
+
+func getScrmanDir() (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("unable to get home dir: %v", err)
+	}
+	return homeDir + "/.scrman", nil
+}
+
 func InitDirectories() error {
 
 	currDir, err := os.Getwd()
@@ -39,11 +63,11 @@ func InitDirectories() error {
 		return err
 	}
 
+	// TODO: Remove this
 	err = initHelloWorld()
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -71,7 +95,7 @@ func InitProject(projectName string) error {
 
 	os.Chdir(projectDir)
 
-	box := packr.NewBox("../templates/script")
+	box := packr.NewBox("../../../templates/script")
 	index, err := box.Find("index.sh")
 	if err != nil {
 		return fmt.Errorf("unable to get index.sh: %v", err)
@@ -95,6 +119,7 @@ func InitProject(projectName string) error {
 	return nil
 }
 
+// TODO: Remove this
 func initHelloWorld() error {
 	currDir, err := os.Getwd()
 	if err != nil {
@@ -116,7 +141,7 @@ func initHelloWorld() error {
 
 	os.Chdir(projectDir)
 
-	box := packr.NewBox("../templates/helloworld")
+	box := packr.NewBox("../../templates/helloworld")
 	index, err := box.Find("index.sh")
 	if err != nil {
 		return fmt.Errorf("unable to get index.sh: %v", err)

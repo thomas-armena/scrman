@@ -4,11 +4,25 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"scr/config"
-	"scr/dir"
+
+	"github.com/spf13/cobra"
+
+	"github.com/thomas-armena/scrman/pkg/config"
+	"github.com/thomas-armena/scrman/pkg/dir"
 )
 
-func Run(args []string) error {
+func NewCmdRun() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "run",
+		Short: "Run a scrman script",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return run(args)
+		},
+	}
+	return cmd
+}
+
+func run(args []string) error {
 	scriptName := args[0]
 	err := runScript(scriptName)
 	if err != nil {
@@ -29,6 +43,7 @@ func runScript(scriptName string) error {
 	if err != nil {
 		return err
 	}
+
 	for _, arg := range config.Arguments {
 		var input string
 		fmt.Printf("%v (default: %v): ", arg.Description, arg.Default)

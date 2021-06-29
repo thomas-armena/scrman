@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"scr/dir"
+
+	"github.com/thomas-armena/scrman/pkg/dir"
 )
 
 type Config struct {
