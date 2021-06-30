@@ -5,48 +5,52 @@ import (
 	"os"
 	"strings"
 
+	"github.com/alecthomas/chroma/quick"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 
 	"github.com/thomas-armena/scrman/pkg/dir"
 )
 
+const (
+	maxCommands        = 25
+	maxCommandsPerPage = 10
+)
+
+type Script struct {
+	Name    string
+	Content string
+}
+
 func NewCmdCreate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a new bash script from bash history",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return create(args)
+			script, err := getScriptInput()
+			if err != nil {
+				return fmt.Errorf("unable to create script dir: %v", err)
+			}
+
+			return create(script, args)
 		},
 	}
 
 	return cmd
 }
 
-func create(args []string) error {
-	scriptText, err := getScriptInput()
-	if err != nil {
-		return fmt.Errorf("unable to create script dir: %v", err)
-	}
-	fmt.Println("------------------")
-	fmt.Println(scriptText)
-	fmt.Println("------------------")
-
-	fmt.Printf("Enter name of script: ")
-	var scriptName string
-	fmt.Scanln(&scriptName)
-
-	if err := dir.CreateScriptDir(scriptName); err != nil {
+func create(script *Script, args []string) error {
+	if err := dir.CreateScriptDir(script.Name); err != nil {
 		return fmt.Errorf("unable to create script dir: %v", err)
 	}
 
-	scriptDir := dir.GetScriptDir(scriptName)
+	scriptDir := dir.GetScriptDir(script.Name)
 	indexFile, err := os.OpenFile(scriptDir+"/index.sh", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		return fmt.Errorf("create: %v", err)
 	}
 	defer indexFile.Close()
-	if _, err = indexFile.WriteString(scriptText); err != nil {
+	if _, err = indexFile.WriteString(script.Content); err != nil {
 		return err
 	}
 	fmt.Println("Script created in: " + scriptDir)
@@ -54,14 +58,14 @@ func create(args []string) error {
 	return nil
 }
 
-func getScriptInput() (string, error) {
+func getScriptInput() (*Script, error) {
 	history, err := getZshHistory()
 	if err != nil {
-		return "", fmt.Errorf("create: %v", err)
+		return nil, fmt.Errorf("create: %v", err)
 	}
 
-	numCommandsToShow := min(25, len(history))
-	pageLength := min(10, numCommandsToShow)
+	numCommandsToShow := min(maxCommands, len(history))
+	pageLength := min(maxCommandsPerPage, numCommandsToShow)
 	lastIndex := len(history) - 1
 
 	commands := history[lastIndex-numCommandsToShow : lastIndex]
@@ -70,6 +74,7 @@ func getScriptInput() (string, error) {
 		Label:    "Select starting command",
 		Selected: " ",
 	}
+
 	startPrompt := promptui.Select{
 		Label:     "Select starting command",
 		Items:     commands,
@@ -78,9 +83,8 @@ func getScriptInput() (string, error) {
 	}
 
 	startingIndex, _, err := startPrompt.RunCursorAt(len(commands)-1, len(commands)-pageLength)
-
 	if err != nil {
-		return "", fmt.Errorf("unable to create script dir: %v", err)
+		return nil, fmt.Errorf("unable to create script dir: %v", err)
 	}
 
 	commands = commands[startingIndex:]
@@ -97,14 +101,25 @@ func getScriptInput() (string, error) {
 	}
 
 	endingIndex, _, err := endPrompt.RunCursorAt(len(commands)-1, len(commands)-1-pageLength)
-
+	if err != nil {
+		return nil, fmt.Errorf("unable to create script dir: %v", err)
+	}
 	commands = commands[:endingIndex+1]
 
-	if err != nil {
-		return "", fmt.Errorf("unable to create script dir: %v", err)
+	script := &Script{
+		Content: strings.Join(commands, "\n"),
 	}
 
-	return strings.Join(commands, "\n"), nil
+	fmt.Print("═══════════════════════════════\n\n")
+	if err := quick.Highlight(os.Stdout, script.Content, "bash", "terminal256", ""); err != nil {
+		return nil, fmt.Errorf("unable to highlight script content: %v", err)
+	}
+	fmt.Print("\n\n═══════════════════════════════\n")
+
+	fmt.Printf("Enter name of script: ")
+	fmt.Scanln(&script.Name)
+
+	return script, nil
 }
 
 // Assumes history is stored in ~/.zsh_history
