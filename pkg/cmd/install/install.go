@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gobuffalo/packr"
 	"github.com/spf13/cobra"
 	"github.com/thomas-armena/scrman/pkg/dir"
+	"github.com/thomas-armena/scrman/pkg/templates"
 )
 
 type InstallScript struct {
@@ -40,8 +40,7 @@ func install(args []string) error {
 // TODO: Move this function to another package. It is also used by create cmd.
 func InstallByScriptName(scriptName string) error {
 
-	box := packr.NewBox("../../../templates/")
-	scriptTemplateText, err := box.FindString("install.sh")
+	scriptTemplateText, err := templates.FindString("install.sh")
 	if err != nil {
 		return err
 	}
@@ -52,7 +51,6 @@ func InstallByScriptName(scriptName string) error {
 	if err != nil {
 		return err
 	}
-
 
 	binDirectory := dir.GetBinDir()
 	binaryName := getLeafOfPath(scriptName)
