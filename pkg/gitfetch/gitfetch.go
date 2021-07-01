@@ -2,9 +2,7 @@ package gitfetch
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/thomas-armena/scrman/pkg/storage"
@@ -42,16 +40,14 @@ func FetchRepo(repo Repository) error {
 }
 
 func allowPermissionsForScripts(root string) error {
-	err := filepath.Walk(root,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			os.Chmod(path, 0777)
-			return nil
-		})
+
+	allScriptDirs, err := storage.GetAllScriptDirs()
 	if err != nil {
-		log.Println(err)
+		return err
+	}
+
+	for _, path := range allScriptDirs {
+		os.Chmod(path, 0777)
 	}
 	return nil
 }

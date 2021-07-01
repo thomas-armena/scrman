@@ -116,3 +116,52 @@ func TestCreateScriptDir(t *testing.T) {
 	}
 
 }
+
+func TestGetAllScriptDirs(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	if err != nil {
+		t.Fatalf("Unable to generate a temp dir: %v", err)
+	}
+	defer os.RemoveAll(dir)
+
+	if err := Init(dir); err != nil {
+		t.Fatalf("failed to initalize dir: %v", err)
+	}
+
+	scripts := []*Script{
+		{Name: "test1", Content: "echo hello"},
+		{Name: "test2", Content: "echo hello"},
+		{Name: "test2/nested1", Content: "echo hello"},
+		{Name: "test2/nested2", Content: "echo hello"},
+		{Name: "test2/nested2/nestednested1", Content: "echo hello"},
+	}
+
+	for _, script := range scripts {
+		AddScript(script)
+	}
+
+	scriptDirs, err := GetAllScriptDirs()
+	if err != nil {
+		t.Fatalf("unable to get all script dirs: %v", err)
+	}
+
+	if len(scriptDirs) != len(scripts) {
+		t.Fatalf("len(scriptDirs) != len(scripts)\nhave: %v\nwant: %v", len(scriptDirs), len(scripts))
+	}
+
+	for _, script := range scripts {
+		expectedDir := GetScriptDir(script.Name) + "/index.sh"
+		if !contains(scriptDirs, expectedDir) {
+			t.Fatalf("Expected to have directory \n%v \nin \n%v", expectedDir, strings.Join(scriptDirs, "\n"))
+		}
+	}
+}
+
+func contains(arr []string, check string) bool {
+	for _, el := range arr {
+		if check == el {
+			return true
+		}
+	}
+	return false
+}

@@ -7,6 +7,7 @@ import (
 	"github.com/thomas-armena/scrman/pkg/cmd/create"
 	"github.com/thomas-armena/scrman/pkg/cmd/fetch"
 	"github.com/thomas-armena/scrman/pkg/cmd/install"
+	"github.com/thomas-armena/scrman/pkg/cmd/ls"
 	"github.com/thomas-armena/scrman/pkg/cmd/run"
 	"github.com/thomas-armena/scrman/pkg/storage"
 )
@@ -25,12 +26,14 @@ func main() {
 	runCmd := run.NewCmdRun()
 	installCmd := install.NewCmdInstall()
 	fetchCmd := fetch.NewCmdFetch()
+	lsCmd := ls.NewCmdLs()
 
 	rootCmd.AddCommand(
 		createCmd,
 		runCmd,
 		installCmd,
 		fetchCmd,
+		lsCmd,
 	)
 
 	if err := rootCmd.Execute(); err != nil {
