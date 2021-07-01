@@ -26,7 +26,7 @@ func NewCmdCreate() *cobra.Command {
 				return fmt.Errorf("unable to create script dir: %v", err)
 			}
 
-			return storage.Create(script)
+			return storage.AddScript(script)
 		},
 	}
 
