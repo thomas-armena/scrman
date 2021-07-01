@@ -8,19 +8,13 @@ import (
 	"github.com/alecthomas/chroma/quick"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-
-	"github.com/thomas-armena/scrman/pkg/dir"
+	"github.com/thomas-armena/scrman/pkg/storage"
 )
 
 const (
 	maxCommands        = 25
 	maxCommandsPerPage = 10
 )
-
-type Script struct {
-	Name    string
-	Content string
-}
 
 func NewCmdCreate() *cobra.Command {
 	cmd := &cobra.Command{
@@ -32,33 +26,14 @@ func NewCmdCreate() *cobra.Command {
 				return fmt.Errorf("unable to create script dir: %v", err)
 			}
 
-			return create(script, args)
+			return storage.Create(script)
 		},
 	}
 
 	return cmd
 }
 
-func create(script *Script, args []string) error {
-	if err := dir.CreateScriptDir(script.Name); err != nil {
-		return fmt.Errorf("unable to create script dir: %v", err)
-	}
-
-	scriptDir := dir.GetScriptDir(script.Name)
-	indexFile, err := os.OpenFile(scriptDir+"/index.sh", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0777)
-	if err != nil {
-		return fmt.Errorf("create: %v", err)
-	}
-	defer indexFile.Close()
-	if _, err = indexFile.WriteString(script.Content); err != nil {
-		return err
-	}
-	fmt.Println("Script created in: " + scriptDir)
-
-	return nil
-}
-
-func getScriptInput() (*Script, error) {
+func getScriptInput() (*storage.Script, error) {
 	history, err := getZshHistory()
 	if err != nil {
 		return nil, fmt.Errorf("create: %v", err)
@@ -106,7 +81,7 @@ func getScriptInput() (*Script, error) {
 	}
 	commands = commands[:endingIndex+1]
 
-	script := &Script{
+	script := &storage.Script{
 		Content: strings.Join(commands, "\n"),
 	}
 

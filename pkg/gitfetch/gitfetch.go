@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/thomas-armena/scrman/pkg/dir"
+	"github.com/thomas-armena/scrman/pkg/storage"
 )
 
 type Repository struct {
@@ -17,7 +17,7 @@ type Repository struct {
 
 func FetchRepo(repo Repository) error {
 
-	scrmanDir := dir.GetRootDir()
+	scrmanDir := storage.GetRootDir()
 	scriptDir := fmt.Sprintf("%v/scripts/%v/%v", scrmanDir, repo.Author, repo.Name)
 	if err := os.MkdirAll(scriptDir, 0777); err != nil {
 		return fmt.Errorf("unable to fetch repo %v: %v", repo.Name, err)

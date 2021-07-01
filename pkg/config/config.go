@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/thomas-armena/scrman/pkg/dir"
+	"github.com/thomas-armena/scrman/pkg/storage"
 )
 
 type Config struct {
@@ -19,7 +19,7 @@ type Argument struct {
 }
 
 func GetConfig(scriptName string) (*Config, error) {
-	scriptDir := dir.GetScriptDir(scriptName)
+	scriptDir := storage.GetScriptDir(scriptName)
 
 	configFile, err := os.ReadFile(scriptDir + "/config.json")
 	if err != nil {

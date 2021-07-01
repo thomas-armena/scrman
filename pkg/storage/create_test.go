@@ -1,12 +1,10 @@
-package create
+package storage
 
 import (
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/thomas-armena/scrman/pkg/dir"
 )
 
 func TestCreate(t *testing.T) {
@@ -16,7 +14,7 @@ func TestCreate(t *testing.T) {
 	}
 	defer os.RemoveAll(tempDir)
 
-	if err := dir.Init(tempDir); err != nil {
+	if err := Init(tempDir); err != nil {
 		t.Fatalf("unable to initalize dir: %v", err)
 	}
 
@@ -29,11 +27,11 @@ echo "asbklnsklnlkanklsnvsaivknlwq"
 		`,
 	}
 
-	if err := create(script, nil); err != nil {
+	if err := Create(script); err != nil {
 		t.Fatalf("failed to create new script: %v", err)
 	}
 
-	scriptPath := dir.GetScriptDir(script.Name + "/index.sh")
+	scriptPath := GetScriptDir(script.Name + "/index.sh")
 	if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
 		t.Fatalf("script file does not exist: %v", err)
 	}
