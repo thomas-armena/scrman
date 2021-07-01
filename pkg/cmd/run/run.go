@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/thomas-armena/scrman/pkg/config"
-	"github.com/thomas-armena/scrman/pkg/dir"
+	"github.com/thomas-armena/scrman/pkg/storage"
 )
 
 func NewCmdRun() *cobra.Command {
@@ -32,7 +32,7 @@ func run(args []string) error {
 }
 
 func runScript(scriptName string) error {
-	scriptDir := dir.GetScriptDir(scriptName)
+	scriptDir := storage.GetScriptDir(scriptName)
 
 	scriptArgs := make([]string, 0)
 	scriptArgs = append(scriptArgs, "")

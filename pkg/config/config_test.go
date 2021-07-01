@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/thomas-armena/scrman/pkg/dir"
+	"github.com/thomas-armena/scrman/pkg/storage"
 )
 
 func TestGetConfig(t *testing.T) {
@@ -15,7 +15,7 @@ func TestGetConfig(t *testing.T) {
 	}
 	defer os.RemoveAll(tempDir)
 
-	if err := dir.Init(tempDir); err != nil {
+	if err := storage.Init(tempDir); err != nil {
 		t.Fatalf("unable to initalize dir: %v", err)
 	}
 
@@ -23,7 +23,7 @@ func TestGetConfig(t *testing.T) {
 		t.Fatalf(`GetConfig("FakeScript").err  = nil; want error`)
 	}
 
-	if err := dir.CreateScriptDir("helloTest"); err != nil {
+	if err := storage.CreateScriptDir("helloTest"); err != nil {
 		t.Fatalf("unable to create script dir: %v", err)
 	}
 
@@ -54,7 +54,7 @@ func TestGetConfig(t *testing.T) {
 	]
 }
 `
-	configPath := dir.GetScriptDir("helloTest/config.json")
+	configPath := storage.GetScriptDir("helloTest/config.json")
 	if err := ioutil.WriteFile(configPath, []byte(testConfig), 0777); err != nil {
 		t.Fatalf("unable to write test config to config.json: %v", err)
 	}

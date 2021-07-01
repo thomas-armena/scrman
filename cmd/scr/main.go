@@ -8,11 +8,11 @@ import (
 	"github.com/thomas-armena/scrman/pkg/cmd/fetch"
 	"github.com/thomas-armena/scrman/pkg/cmd/install"
 	"github.com/thomas-armena/scrman/pkg/cmd/run"
-	"github.com/thomas-armena/scrman/pkg/dir"
+	"github.com/thomas-armena/scrman/pkg/storage"
 )
 
 func main() {
-	if err := dir.InitDefault(); err != nil {
+	if err := storage.InitDefault(); err != nil {
 		log.Fatalf("Unable to initalize scr directories: %v", err)
 	}
 
