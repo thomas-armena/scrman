@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/thomas-armena/scrman/pkg/templates"
@@ -92,6 +93,25 @@ func CreateScriptDir(scriptName string) error {
 	}
 
 	return nil
+}
+
+func GetAllScriptDirs() ([]string, error) {
+	scriptDirs := make([]string, 0)
+
+	err := filepath.Walk(scrmanRoot,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if getLeafOfPath(path) == "index.sh" {
+				scriptDirs = append(scriptDirs, path)
+			}
+			return nil
+		})
+	if err != nil {
+		return scriptDirs, err
+	}
+	return scriptDirs, nil
 }
 
 func getLeafOfPath(path string) string {
