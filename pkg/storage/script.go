@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -95,26 +96,81 @@ func CreateScriptDir(scriptName string) error {
 	return nil
 }
 
+func GetScriptSubDirs(path string) ([]string, error) {
+	nodes := pathNodes(path)
+	expectedLen := len(nodes) + 1
+	allScriptDirs, err := GetAllScriptDirs()
+	if err != nil {
+		return nil, err
+	}
+	subdirs := make([]string, 0)
+	for _, scriptDir := range allScriptDirs {
+		scriptNodes := pathNodesFromRoot(scriptDir)
+		if isPrefix(nodes, scriptNodes) {
+			subdir := strings.Join(scriptNodes[:expectedLen], "/")
+			subdirs = append(subdirs, subdir)
+		}
+	}
+	subdirs = removeDuplicates(subdirs)
+	return subdirs, nil
+}
+
 func GetAllScriptDirs() ([]string, error) {
 	scriptDirs := make([]string, 0)
 
 	err := filepath.Walk(scrmanRoot,
-		func(path string, info os.FileInfo, err error) error {
+		func(p string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
-			if getLeafOfPath(path) == "index.sh" {
-				scriptDirs = append(scriptDirs, path)
+			if path.Base(p) == "index.sh" {
+				scriptDirs = append(scriptDirs, path.Dir(p))
 			}
 			return nil
 		})
 	if err != nil {
-		return scriptDirs, err
+		return scriptDirs, fmt.Errorf("unable to get all script dirs: %v", err)
 	}
 	return scriptDirs, nil
 }
 
 func getLeafOfPath(path string) string {
-	separated := strings.Split(path, "/")
-	return separated[len(separated)-1]
+	nodes := pathNodes(path)
+	return nodes[len(nodes)-1]
+}
+
+func pathNodes(path string) []string {
+	return strings.Split(path, "/")
+}
+
+func pathNodesFromRoot(path string) []string {
+	nodes := pathNodes(path)
+	rootNodes := pathNodes(scrmanRoot)
+	firstIndex := len(rootNodes) + 1
+	return nodes[firstIndex:]
+}
+
+func isPrefix(a []string, b []string) bool {
+	if len(b) <= len(a) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func removeDuplicates(arr []string) []string {
+	seen := make(map[string]bool)
+	new := make([]string, 0)
+	for _, el := range arr {
+		if seen[el] {
+			continue
+		}
+		seen[el] = true
+		new = append(new, el)
+	}
+	return new
 }

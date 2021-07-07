@@ -2,7 +2,6 @@ package ls
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/thomas-armena/scrman/pkg/storage"
@@ -29,16 +28,7 @@ func listScriptDirs() error {
 		return fmt.Errorf("unable to list script directories: %v", err)
 	}
 	for _, scriptDir := range allScriptDirs {
-		path := removeLeafNode(scriptDir)
-		fmt.Println(path)
+		fmt.Println(scriptDir)
 	}
 	return nil
-}
-
-func removeLeafNode(path string) string {
-	nodes := strings.Split(path, "/")
-	if len(nodes) <= 1 {
-		return path
-	}
-	return strings.Join(nodes[:len(nodes)-1], "/")
 }
